@@ -2,7 +2,7 @@ import { cache } from "react";
 import db from "./drizzle";
 import { auth } from "@clerk/nextjs";
 import { eq } from "drizzle-orm";
-import { courses, userProgress } from "./schema";
+import { challengeProgress, challenges, courses, units, userProgress } from "./schema";
 
 export const getCourses = cache(async () => {
     const data = await db.query.courses.findMany();
@@ -32,5 +32,48 @@ export const getCourseById = cache(async (courseId: number) => {
         // TODO: populate units and lessons
     });
     return data;
+});
+
+export const getUnits = cache(async () => {
+    const { userId } = auth();
+    const userProgress = await getUserProgress();
+    if (!userId || !userProgress || !userProgress.activeCourseId) {
+        return [];
+    }
+
+    // TODO: confirm if order is needed field
+    const data = await db.query.units.findMany({
+        where: eq(units.courseId, userProgress.activeCourseId),
+        with: {
+            lessons: {
+                with: {
+                    challenges: {
+                        with: {
+                            challengeProgress: {
+                                // Only load data for the particular user ->
+                                // if we do challengeProgress: true it loads all data for all users
+                                where: eq(challengeProgress.userId, userId),
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // REFAC: this can be optimized with drizzle's regular syntax (SQL like)
+    const normalizedData = data.map((unit) => {
+        const lessonsWithCompletedStatus = unit.lessons.map((lesson) => {
+            const allCompletedChallenges = lesson.challenges.every((cha) => {
+                return cha.challengeProgress
+                    && cha.challengeProgress.length > 0
+                    && cha.challengeProgress.every((prog) => prog.completed);
+            });
+            return { ...lesson, completed: allCompletedChallenges };
+        });
+        return { ...unit, lessons: lessonsWithCompletedStatus };
+    });
+
+    return normalizedData;
 });
 
