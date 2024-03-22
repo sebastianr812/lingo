@@ -27,7 +27,7 @@ export const Unit = ({
             />
             <div className="flex items-center flex-col relative">
                 {lessons.map((lesson, idx) => {
-                    const isCur = lesson.id === activeLesson?.id
+                    const isCur =lesson.id === activeLesson?.id;
                     const isLocked = !lesson.completed && !isCur;
 
                     return (
