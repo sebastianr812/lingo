@@ -1,4 +1,4 @@
-import {Loader2} from "lucide-react";
+import { Loader2 } from "lucide-react";
 import {
     ClerkLoaded,
     ClerkLoading,
@@ -19,7 +19,7 @@ export const Header = () => {
                     <h1 className="font-2xl font-extrabold text-green-600 tracking-wide">Lingo</h1>
                 </div>
                 <ClerkLoading>
-                    <Loader2 className="h-5 w-5 text-muted-foreground animate-spin"/>
+                    <Loader2 className="h-5 w-5 text-muted-foreground animate-spin" />
                 </ClerkLoading>
                 <ClerkLoaded>
                     <SignedIn>
