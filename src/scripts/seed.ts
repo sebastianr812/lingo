@@ -122,7 +122,7 @@ async function main() {
                 challengeId: 1,
                 imageSrc: "/robot.svg",
                 correct: false,
-                text: "el robot",
+                text: "El robot",
                 audioSrc: "/es_robot.mp3",
             },
         ]);
