@@ -1,10 +1,12 @@
 "use server"; // always use use server when defining server actions
 import db from "@/db/drizzle";
 import { getCourseById, getUserProgress } from "@/db/queries";
-import { userProgress } from "@/db/schema";
+import { challengeProgress, challenges, userProgress } from "@/db/schema";
 import { auth, currentUser } from "@clerk/nextjs";
+import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { cache } from "react";
 
 
 export async function upsertUserProgress(courseId: number) {
@@ -51,4 +53,58 @@ export async function upsertUserProgress(courseId: number) {
     revalidatePath("/learn");
     redirect("/learn");
 }
+
+export async function reduceHearts(challengeId: number) {
+    const { userId } = auth();
+
+    if (!userId) {
+        throw new Error("unauthorized");
+    }
+
+    const currentUserProgress = await getUserProgress();
+
+    const challenge = await db.query.challenges.findFirst({
+        where: eq(challenges.id, challengeId),
+    });
+
+    if (!challenge) {
+        throw new Error("no challenge found");
+    }
+
+    const lessonId = challenge.lessonId;
+    // TODO: get user subscription status
+
+    const existingChallengeProgress = await db.query.challengeProgress.findFirst({
+        where: and(
+            eq(challengeProgress.userId, userId),
+            eq(challengeProgress.challengeId, challengeId)
+        ),
+    });
+
+    const isPractice = !!existingChallengeProgress;
+
+    if (isPractice) {
+        return { error: "practice" };
+    }
+
+    if (!currentUserProgress) {
+        throw new Error("user progress not found dummy");
+    }
+    // TODO: handle subscription
+
+    if (currentUserProgress.hearts === 0) {
+        return { error: "hearts" };
+    }
+
+    await db.update(userProgress).set({
+        hearts: Math.max(currentUserProgress.hearts - 1, 0),
+    }).where(eq(userProgress.userId, userId));
+
+    revalidatePath("/shop");
+    revalidatePath("/learn");
+    revalidatePath("/quests");
+    revalidatePath("/leaderboard");
+    revalidatePath(`/lesson/${lessonId}`);
+}
+
 
