@@ -2,9 +2,14 @@ import { Quiz } from "@/components/Quiz";
 import { getLesson, getUserProgress } from "@/db/queries";
 import { redirect } from "next/navigation";
 
-export default async function LessonPage() {
+type Props = {
+    params: {
+        lessonId: number;
+    }
+}
+export default async function LessonIdPage({ params }: Props) {
 
-    const lessonPromise = getLesson();
+    const lessonPromise = getLesson(params.lessonId);
     const userProgressPromise = getUserProgress();
 
     const [
@@ -30,7 +35,7 @@ export default async function LessonPage() {
             initalLessonChallenges={lesson.challenges}
             initalHearts={userProgress.hearts}
             initalPercentage={initalPercentage}
-            userSubscription={null} // TODO: add user sub
+            userSubscription={null} // TODO: add user subscription
         />
     );
 }
