@@ -1,4 +1,5 @@
 "use server"; // always use use server when defining server actions
+
 import db from "@/db/drizzle";
 import { getCourseById, getUserProgress } from "@/db/queries";
 import { challengeProgress, challenges, userProgress } from "@/db/schema";
@@ -6,7 +7,8 @@ import { auth, currentUser } from "@clerk/nextjs";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { cache } from "react";
+
+const POINTS_TO_REFILL = 10;
 
 
 export async function upsertUserProgress(courseId: number) {
@@ -105,6 +107,32 @@ export async function reduceHearts(challengeId: number) {
     revalidatePath("/quests");
     revalidatePath("/leaderboard");
     revalidatePath(`/lesson/${lessonId}`);
+}
+
+export async function refillHearts() {
+    const currentUserProgress = await getUserProgress();
+
+    if (!currentUserProgress) {
+        throw new Error("user progress not found");
+    }
+
+    if (currentUserProgress.hearts === 5) {
+        throw new Error("hearts are already full");
+    }
+
+    if (currentUserProgress.points < POINTS_TO_REFILL) {
+        throw new Error("insufficient points");
+    }
+
+    await db.update(userProgress).set({
+        hearts: 5,
+        points: currentUserProgress.points - POINTS_TO_REFILL
+    }).where(eq(userProgress.userId, currentUserProgress.userId));
+
+    revalidatePath("/shop");
+    revalidatePath("/learn");
+    revalidatePath("/quests");
+    revalidatePath("/leaderboard");
 }
 
 
