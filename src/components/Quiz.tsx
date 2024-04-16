@@ -7,7 +7,7 @@ import { QuestionBubble } from "./QuestionBubble";
 import { Challenge } from "./Challenge";
 import { ChallengeFooter } from "./ChallengeFooter";
 import { ResultCard } from "./ResultCard";
-import { challengeOptions, challenges } from "@/db/schema";
+import { challengeOptions, challenges, userSubscription } from "@/db/schema";
 import { useState, useTransition } from "react";
 import { upsertChallengeProgress } from "@/actions/challengeProgress";
 import { toast } from "sonner";
@@ -25,7 +25,9 @@ type Props = {
         completed: boolean;
         challengeOptions: typeof challengeOptions.$inferSelect[];
     })[];
-    userSubscription: any; // TODO: replace with correct db type for Stripe sub
+    userSubscription: typeof userSubscription.$inferSelect & {
+        isActive: boolean;
+    } | null;
 }
 
 export const Quiz = ({

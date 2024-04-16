@@ -1,15 +1,13 @@
 "use server"; // always use use server when defining server actions
 
+import { POINTS_TO_REFILL } from "@/constants";
 import db from "@/db/drizzle";
-import { getCourseById, getUserProgress } from "@/db/queries";
+import { getCourseById, getUserProgress, getUserSubscription } from "@/db/queries";
 import { challengeProgress, challenges, userProgress } from "@/db/schema";
 import { auth, currentUser } from "@clerk/nextjs";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-
-const POINTS_TO_REFILL = 10;
-
 
 export async function upsertUserProgress(courseId: number) {
     const { userId } = auth();
@@ -23,12 +21,9 @@ export async function upsertUserProgress(courseId: number) {
     if (!course) {
         throw new Error("course not found");
     }
-    // TODO: uncomment once we add units table and lessons table
-    /*
-        if (!course.units.length || !course.units[0].lessons.length) {
-            throw new Error("course is empty");
-        }
-    */
+    if (!course.units.length || !course.units[0].lessons.length) {
+        throw new Error("course is empty");
+    }
 
     const existingUserProgress = await getUserProgress();
     // User already has userProgress for a course, we can just update it
@@ -74,7 +69,7 @@ export async function reduceHearts(challengeId: number) {
     }
 
     const lessonId = challenge.lessonId;
-    // TODO: get user subscription status
+    const userSubscription = await getUserSubscription();
 
     const existingChallengeProgress = await db.query.challengeProgress.findFirst({
         where: and(
@@ -92,7 +87,10 @@ export async function reduceHearts(challengeId: number) {
     if (!currentUserProgress) {
         throw new Error("user progress not found dummy");
     }
-    // TODO: handle subscription
+
+    if (userSubscription?.isActive) {
+        return { error: "subscription" };
+    }
 
     if (currentUserProgress.hearts === 0) {
         return { error: "hearts" };

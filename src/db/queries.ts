@@ -28,8 +28,17 @@ export const getUserProgress = cache(async () => {
 
 export const getCourseById = cache(async (courseId: number) => {
     const data = await db.query.courses.findFirst({
-        where: eq(courses.id, courseId)
-        // TODO: populate units and lessons
+        where: eq(courses.id, courseId),
+        with: {
+            units: {
+                orderBy: (units, { asc }) => [asc(units.order)],
+                with: {
+                    lessons: {
+                        orderBy: (lessons, { asc }) => [asc(lessons.order)],
+                    }
+                }
+            }
+        }
     });
     return data;
 });
@@ -41,13 +50,15 @@ export const getUnits = cache(async () => {
         return [];
     }
 
-    // TODO: confirm if order is needed field
     const data = await db.query.units.findMany({
+        orderBy: (units, { asc }) => [asc(units.order)],
         where: eq(units.courseId, userProgress.activeCourseId),
         with: {
             lessons: {
+                orderBy: (lessons, { asc }) => [asc(lessons.order)],
                 with: {
                     challenges: {
+                        orderBy: (challenges, { asc }) => [asc(challenges.order)],
                         with: {
                             challengeProgress: {
                                 // Only load data for the particular user ->
@@ -112,7 +123,6 @@ export const getCourseProgress = cache(async () => {
     const firstUncompletedLesson = unitsInActiveCourse
         .flatMap((unit) => unit.lessons)
         .find((lesson) => lesson.challenges
-            // TODO: if error check last if clause
             .some((challenge) =>
                 !challenge.challengeProgress ||
                 challenge.challengeProgress.length === 0 ||
@@ -158,7 +168,6 @@ export const getLesson = cache(async (id?: number) => {
     }
 
     const normalizedChallenges = data.challenges.map((chal) => {
-        // TODO: if error check last if clause
         const isCompleted = chal.challengeProgress &&
             chal.challengeProgress.length > 0 &&
             chal.challengeProgress.every((prog) => prog.completed);
@@ -207,7 +216,7 @@ export const getUserSubscription = cache(async () => {
         return null
     }
 
-    const isActive = data.strpePriceId &&
+    const isActive = data.stripePriceId &&
         data.stripeCurrentPeriodEnd?.getTime()! + DAY_IN_MS > Date.now();
 
     return {
@@ -216,5 +225,26 @@ export const getUserSubscription = cache(async () => {
     }
 
 
+});
+
+export const getTopTenUsers = cache(async () => {
+    const { userId } = auth();
+
+    if (!userId) {
+        return [];
+    }
+
+    const data = await db.query.userProgress.findMany({
+        orderBy: (userProgress, { desc }) => [desc(userProgress.points)],
+        limit: 10,
+        columns: {
+            userId: true,
+            userName: true,
+            userImageSrc: true,
+            points: true,
+        }
+    });
+
+    return data;
 });
 

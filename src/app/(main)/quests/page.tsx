@@ -1,12 +1,34 @@
 import { FeedWrapper } from "@/components/FeedWrapper";
-import { Items } from "@/components/Items";
 import { StickyWrapper } from "@/components/StickyWrapper";
 import { UserProgress } from "@/components/UserProgress";
 import { getUserProgress, getUserSubscription } from "@/db/queries";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 
-export default async function ShopPage() {
+const quests = [
+    {
+        title: "Earn 20 XP",
+        value: 20,
+    },
+    {
+        title: "Earn 50 XP",
+        value: 50,
+    },
+    {
+        title: "Earn 100 XP",
+        value: 100,
+    },
+    {
+        title: "Earn 500 XP",
+        value: 500,
+    },
+    {
+        title: "Earn 1000 XP",
+        value: 1000,
+    },
+];
+
+export default async function QuestsPage() {
 
     const userProgressPromise = getUserProgress();
     const userSubscriptionPromise = getUserSubscription();
@@ -38,22 +60,22 @@ export default async function ShopPage() {
             <FeedWrapper>
                 <div className="w-full flex flex-col items-center">
                     <Image
-                        src="/shop.svg"
-                        alt="Shop"
+                        src="/quests.svg"
+                        alt="Quests"
                         height={90}
                         width={90}
                     />
                     <h1 className="text-center font-bold text-enutral-800 text-2xl my-6">
-                        Shop
+                        Quests
                     </h1>
                     <p className="text-muted-foreground text-center text-lg mb-6">
-                        Spend your points on cool stuff.
+                        Complete quests by earning points.
                     </p>
-                    <Items
-                        hearts={userProgress.hearts}
-                        points={userProgress.points}
-                        hasActiveSubscription={isPro}
-                    />
+                    <ul className="w-full">
+                        {quests.map((quest) => (
+
+                        ))}
+                    </ul>
                 </div>
             </FeedWrapper>
         </div>

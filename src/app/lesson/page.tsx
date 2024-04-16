@@ -1,18 +1,21 @@
 import { Quiz } from "@/components/Quiz";
-import { getLesson, getUserProgress } from "@/db/queries";
+import { getLesson, getUserProgress, getUserSubscription } from "@/db/queries";
 import { redirect } from "next/navigation";
 
 export default async function LessonPage() {
 
     const lessonPromise = getLesson();
     const userProgressPromise = getUserProgress();
+    const userSubscriptionPromise = getUserSubscription();
 
     const [
         lesson,
         userProgress,
+        userSubscription,
     ] = await Promise.all([
-            lessonPromise,
-            userProgressPromise,
+        lessonPromise,
+        userProgressPromise,
+        userSubscriptionPromise
     ]);
 
     if (!lesson || !userProgress) {
@@ -30,7 +33,7 @@ export default async function LessonPage() {
             initalLessonChallenges={lesson.challenges}
             initalHearts={userProgress.hearts}
             initalPercentage={initalPercentage}
-            userSubscription={null} // TODO: add user sub
+            userSubscription={userSubscription}
         />
     );
 }

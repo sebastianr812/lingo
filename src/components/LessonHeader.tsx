@@ -17,7 +17,7 @@ export const LessonHeader = ({
     return (
         <header className="lg:pt-[50px] pt-[20px] px-10 flex gap-x-7 items-center justify-between max-w-[1140px] mx-auto w-full">
             <X
-                onClick={open} // TODO: add on exit event handler
+                onClick={open}
                 className="text-slate-500 hover:opacity-75 transition cursor-pointer"
             />
             <Progress value={percentage} />
@@ -30,7 +30,7 @@ export const LessonHeader = ({
                     className="mr-2"
                 />
                 {hasActiveSubscription ?
-                    <InfinityIcon className="w-6 h-6 stoke-[3]" /> :
+                    <InfinityIcon className="w-6 h-6 stroke-[3] shrink-0" /> :
                     hearts}
             </div>
         </header>

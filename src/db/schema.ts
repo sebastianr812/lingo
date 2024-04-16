@@ -80,7 +80,7 @@ export const challengesOptionsRelations = relations(challengeOptions, ({ one }) 
 
 export const challengeProgress = pgTable("challenge_progress", {
     id: serial("id").primaryKey(),
-    userId: text("user_id").notNull(), // TODO: confirm this doesnt break when NOT having a logged in user
+    userId: text("user_id").notNull(),
     challengeId: integer("challenge_id").references(() => challenges.id, { onDelete: "cascade" }).notNull(),
     completed: boolean("completed").notNull().default(false),
 });
@@ -115,8 +115,8 @@ export const userSubscription = pgTable("user_subscription", {
     id: serial("id").primaryKey(),
     userId: text("user_id").notNull().unique(),
     stripeCustomerId: text("stripe_customer_id").notNull().unique(),
-    strpeSubscriptionId: text("stripe_subscription_id").notNull().unique(),
-    strpePriceId: text("stripe_price_id").notNull(),
+    stripeSubscriptionId: text("stripe_subscription_id").notNull().unique(),
+    stripePriceId: text("stripe_price_id").notNull(),
     stripeCurrentPeriodEnd: timestamp("stripe_curent_period_end").notNull(),
 });
 
