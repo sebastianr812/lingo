@@ -1,32 +1,13 @@
 import { FeedWrapper } from "@/components/FeedWrapper";
+import { Promo } from "@/components/Promo";
 import { StickyWrapper } from "@/components/StickyWrapper";
 import { UserProgress } from "@/components/UserProgress";
-import { getUserProgress, getUserSubscription } from "@/db/queries";
+import { Progress } from "@/components/ui/progress";
 import Image from "next/image";
+import { getUserProgress, getUserSubscription } from "@/db/queries";
 import { redirect } from "next/navigation";
+import { quests } from "@/constants";
 
-const quests = [
-    {
-        title: "Earn 20 XP",
-        value: 20,
-    },
-    {
-        title: "Earn 50 XP",
-        value: 50,
-    },
-    {
-        title: "Earn 100 XP",
-        value: 100,
-    },
-    {
-        title: "Earn 500 XP",
-        value: 500,
-    },
-    {
-        title: "Earn 1000 XP",
-        value: 1000,
-    },
-];
 
 export default async function QuestsPage() {
 
@@ -56,6 +37,9 @@ export default async function QuestsPage() {
                     points={userProgress.points}
                     hasActiveSubscription={isPro}
                 />
+                {!isPro && (
+                    <Promo />
+                )}
             </StickyWrapper>
             <FeedWrapper>
                 <div className="w-full flex flex-col items-center">
@@ -72,9 +56,32 @@ export default async function QuestsPage() {
                         Complete quests by earning points.
                     </p>
                     <ul className="w-full">
-                        {quests.map((quest) => (
+                        {quests.map((quest) => {
+                            const progress = (userProgress.points / quest.value) * 100;
+                            return (
+                                <div
+                                    key={quest.title}
+                                    className="flex items-center w-full p-4 gap-x-4 border-t-2"
+                                >
+                                    <Image
+                                        src="/points.svg"
+                                        alt="Points"
+                                        width={60}
+                                        height={60}
+                                    />
 
-                        ))}
+                                    <div className="flex flex-col gap-y-2 w-full">
+                                        <p className="text-neutral-700 text-xl font-bold">
+                                            {quest.title}
+                                        </p>
+                                        <Progress
+                                            value={progress}
+                                            className="h-3"
+                                        />
+                                    </div>
+                                </div>
+                            );
+                        })}
                     </ul>
                 </div>
             </FeedWrapper>
