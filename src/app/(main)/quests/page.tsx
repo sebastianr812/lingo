@@ -61,7 +61,7 @@ export default async function QuestsPage() {
                             return (
                                 <div
                                     key={quest.title}
-                                    className="flex items-center w-full p-4 gap-x-4 border-t-2"
+                                    className="flex items-center w-full border-t-2 p-4 gap-x-4"
                                 >
                                     <Image
                                         src="/points.svg"

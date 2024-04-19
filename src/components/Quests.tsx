@@ -1,11 +1,12 @@
+import { quests } from "@/constants";
 import { Button } from "./ui/button";
 import Link from "next/link";
+import { Progress } from "./ui/progress";
+import Image from "next/image";
 
 type Props = {
     points: number;
 }
-
-// TODO: FINISH
 
 export const Quests = ({ points }: Props) => {
     return (
@@ -23,6 +24,34 @@ export const Quests = ({ points }: Props) => {
                     </Button>
                 </Link>
             </div>
+            <ul className="w-full space-y-4">
+                {quests.map((quest) => {
+                    const progress = (points / quest.value) * 100;
+                    return (
+                        <div
+                            key={quest.title}
+                            className="flex items-center w-full pb-4 gap-x-3"
+                        >
+                            <Image
+                                src="/points.svg"
+                                alt="Points"
+                                width={40}
+                                height={40}
+                            />
+
+                            <div className="flex flex-col gap-y-2 w-full">
+                                <p className="text-neutral-700 text-sm font-bold">
+                                    {quest.title}
+                                </p>
+                                <Progress
+                                    value={progress}
+                                    className="h-2"
+                                />
+                            </div>
+                        </div>
+                    );
+                })}
+            </ul>
         </div>
     );
 }
