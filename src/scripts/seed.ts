@@ -55,7 +55,35 @@ async function main() {
                 title: "Unit 1",
                 description: "Learn the basics of Spanish",
                 order: 1,
-            }
+            },
+            {
+                id: 2,
+                courseId: 2,
+                title: "Unit 1",
+                description: "Learn the basics of French",
+                order: 2,
+            },
+            {
+                id: 3,
+                courseId: 3,
+                title: "Unit 1",
+                description: "Learn the basics of Croatian",
+                order: 3,
+            },
+            {
+                id: 4,
+                courseId: 4,
+                title: "Unit 1",
+                description: "Learn the basics of Japanese",
+                order: 4,
+            },
+            {
+                id: 5,
+                courseId: 5,
+                title: "Unit 1",
+                description: "Learn the basics of Italian",
+                order: 5,
+            },
         ]);
 
         await db.insert(schema.lessons).values([
@@ -89,6 +117,30 @@ async function main() {
                 title: "Verbs",
                 order: 5,
             },
+            {
+                id: 6,
+                unitId: 2,
+                title: "Verbs",
+                order: 6,
+            },
+            {
+                id: 7,
+                unitId: 3,
+                title: "Verbs",
+                order: 7,
+            },
+            {
+                id: 8,
+                unitId: 4,
+                title: "Verbs",
+                order: 8,
+            },
+            {
+                id: 9,
+                unitId: 5,
+                title: "Verbs",
+                order: 9,
+            },
         ]);
 
         await db.insert(schema.challenges).values([
@@ -112,6 +164,34 @@ async function main() {
                 type: "SELECT",
                 order: 3,
                 question: 'Which one of these is "the robot"?',
+            },
+            {
+                id: 4,
+                lessonId: 6,
+                type: "SELECT",
+                order: 4,
+                question: 'Which one of these is "the man"?',
+            },
+            {
+                id: 5,
+                lessonId: 7,
+                type: "SELECT",
+                order: 5,
+                question: 'Which one of these is "the man"?',
+            },
+            {
+                id: 6,
+                lessonId: 8,
+                type: "SELECT",
+                order: 6,
+                question: 'Which one of these is "the man"?',
+            },
+            {
+                id: 1,
+                lessonId: 9,
+                type: "SELECT",
+                order: 7,
+                question: 'Which one of these is "the man"?',
             },
         ]);
 
@@ -205,6 +285,32 @@ async function main() {
                 type: "SELECT",
                 order: 3,
                 question: 'Which one of these is "the robot"?',
+            },
+        ]);
+
+        // TODO: grab audio files for diff languages
+        // finish seed script to get 1 question for each language
+        await db.insert(schema.challengeOptions).values([
+            {
+                challengeId: 4,
+                imageSrc: "/man.svg",
+                correct: true,
+                text: "El hombre",
+                audioSrc: "/es_man.mp3",
+            },
+            {
+                challengeId: 4,
+                imageSrc: "/woman.svg",
+                correct: false,
+                text: "La mujer",
+                audioSrc: "/es_woman.mp3",
+            },
+            {
+                challengeId: 4,
+                imageSrc: "/robot.svg",
+                correct: false,
+                text: "El robot",
+                audioSrc: "/es_robot.mp3",
             },
         ]);
 
