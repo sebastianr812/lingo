@@ -5,7 +5,7 @@ import {
 } from "@/components/ui/sheet";
 
 import { MenuIcon } from "lucide-react";
-import { Sidebar } from "./Sidebar";
+import { Sidebar } from "./Sidebar_temp";
 
 export const MobileSidebar = () => {
     return (
